@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jannat OTP - Instant Virtual SMS Verification Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Top Navigation Header -->
+    <header class="top-header">
+        <div class="header-left">
+            <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle Navigation"><i class="fa-solid fa-bars"></i></button>
+            <div class="brand-logo">
+                <i class="fa-solid fa-bolt logo-icon"></i>
+                <span class="logo-text">JANNAT <span>OTP</span></span>
+            </div>
+            <span class="notice-badge"><i class="fa-solid fa-bullhorn"></i> System status: Online & Fast OTP Delivery</span>
+        </div>
+
+        <div class="header-right">
+            <div class="balance-badge" id="user-balance-box">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Balance:</span>
+                <strong id="balance-val" class="user-balance-display">Rs. 0</strong>
+                <button class="btn-topup" id="btn-topup"><i class="fa-solid fa-plus"></i> Recharge</button>
+            </div>
+
+            <div class="user-menu" id="auth-buttons">
+                <button class="btn-auth" onclick="promptAdminLogin()" title="Admin Panel" style="background:transparent; border:1px solid rgba(255,255,255,0.08); font-size:14px; padding:6px 10px; cursor:pointer; color:var(--text-muted);"><i class="fa-solid fa-shield-halved"></i></button>
+                <button class="btn-auth btn-login-modal" id="open-login"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                <button class="btn-auth btn-register-modal" id="open-register"><i class="fa-solid fa-user-plus"></i> Register</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container Grid -->
+    <div class="app-layout">
+
+        <!-- Left Navigation Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-sec">
+                <div class="sec-title"><i class="fa-solid fa-tower-cell"></i> SMS Receive Center</div>
+                <ul class="nav-list">
+                    <li class="active" data-page="store"><a href="#store"><i class="fa-solid fa-store"></i> API Store</a></li>
+                    <li data-page="orders"><a href="#orders"><i class="fa-solid fa-cart-shopping"></i> My Orders <span class="badge-count" id="active-orders-count">0</span></a></li>
+                    <li data-page="api"><a href="#api"><i class="fa-solid fa-code"></i> My API Keys</a></li>
+                    <li data-page="sms-records"><a href="#sms-records"><i class="fa-solid fa-message"></i> SMS Records</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-sec">
+                <div class="sec-title"><i class="fa-solid fa-headset"></i> Voice & Email</div>
+                <ul class="nav-list">
+                    <li data-page="email"><a href="#email"><i class="fa-solid fa-envelope"></i> Email Receive</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-sec">
+                <div class="sec-title"><i class="fa-solid fa-code"></i> Developer Docs</div>
+                <ul class="nav-list">
+                    <li data-page="docs"><a href="#docs"><i class="fa-solid fa-book"></i> API Documentation</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-sec">
+                <div class="sec-title"><i class="fa-solid fa-users"></i> Affiliates & Invites</div>
+                <ul class="nav-list">
+                    <li data-page="invites"><a href="#invites"><i class="fa-solid fa-ticket"></i> Invite Management</a></li>
+                    <li data-page="commission"><a href="#commission"><i class="fa-solid fa-sack-dollar"></i> Commission & Payouts</a></li>
+                </ul>
+            </div>
+
+            <div class="sidebar-sec">
+                <div class="sec-title"><i class="fa-solid fa-user-gear"></i> Personal Account</div>
+                <ul class="nav-list">
+                    <li data-page="recharge"><a href="#recharge"><i class="fa-solid fa-credit-card"></i> Account Recharge</a></li>
+                    <li data-page="financial"><a href="#financial"><i class="fa-solid fa-file-invoice-dollar"></i> Financial History</a></li>
+                    <li data-page="password"><a href="#password"><i class="fa-solid fa-key"></i> Password Modification</a></li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="main-content">
+            
+            <!-- Active Order Panel (Live SMS OTP Box) -->
+            <div class="active-panel" id="active-panel" style="display: none;">
+                <div class="panel-head">
+                    <h3><span class="live-dot"></span> Active Activation — <span id="active-service-name">WhatsApp</span> <span id="active-country-name"></span></h3>
+                    <div class="timer-tag" id="timer-box"><i class="fa-regular fa-clock"></i> 15:00</div>
+                </div>
+
+                <div class="panel-grid">
+                    <div class="box-tile">
+                        <span class="tile-title">Virtual Phone Number</span>
+                        <div class="tile-row">
+                            <span class="number-val" id="active-num-val">+0000000000</span>
+                            <button class="btn-sm" onclick="copyText('active-num-val', 'Phone number copied!')"><i class="fa-regular fa-copy"></i> Copy Number</button>
+                        </div>
+                    </div>
+
+                    <div class="box-tile highlight-box">
+                        <span class="tile-title">Incoming Verification OTP</span>
+                        <div class="tile-row">
+                            <span class="otp-val" id="active-otp-val">------</span>
+                            <button class="btn-sm btn-green" onclick="copyText('active-otp-val', 'OTP copied!')"><i class="fa-regular fa-copy"></i> Copy Code</button>
+                        </div>
+                        <div class="status-loader" id="status-loader"><span class="spin"></span> Listening for real-time incoming SMS...</div>
+                    </div>
+                </div>
+
+                <div class="panel-foot">
+                    <button class="btn-action btn-cancel" id="cancel-order-btn"><i class="fa-solid fa-xmark"></i> Cancel & Refund</button>
+                    <button class="btn-action btn-finish" id="finish-order-btn"><i class="fa-solid fa-check"></i> Complete Activation</button>
+                </div>
+            </div>
+
+            <!-- Page 1: API Store (Default) -->
+            <section class="page-sec active" id="page-store">
+                
+                <div class="filter-toolbar">
+                    <div class="search-wrap">
+                        <i class="fa-solid fa-magnifying-glass search-ic"></i>
+                        <input type="text" id="store-search" class="search-inp" placeholder="Search service (e.g., WhatsApp, Telegram, OpenAI, Google)...">
+                    </div>
+
+                    <div class="select-wrap">
+                        <select id="country-filter" class="select-inp">
+                            <option value="any" selected>⚡ Any available country</option>
+                            <option value="261">🇲🇬 Madagascar (+261)</option>
+                            <option value="224">🇬🇳 Guinea (+224)</option>
+                            <option value="382">🇲🇪 Montenegro (+382)</option>
+                            <option value="44">🇬🇧 United Kingdom (+44)</option>
+                            <option value="380">🇺🇦 Ukraine (+380)</option>
+                            <option value="992">🇹🇯 Tajikistan (+992)</option>
+                            <option value="232">🇸🇱 Sierra Leone (+232)</option>
+                            <option value="374">🇦🇲 Armenia (+374)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h2 class="sec-h2"><i class="fa-solid fa-cubes"></i> Popular Activation Services</h2>
+                <div class="store-grid" id="store-grid">
+                    <!-- Service cards rendered via JS -->
+                </div>
+            </section>
+
+            <!-- Page 2: My Orders -->
+            <section class="page-sec" id="page-orders">
+                <h2 class="sec-h2"><i class="fa-solid fa-cart-shopping"></i> My Orders</h2>
+                <div class="table-card">
+                    <table class="data-tbl">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Service</th>
+                                <th>Phone Number</th>
+                                <th>Verification Code</th>
+                                <th>Status</th>
+                                <th>Date / Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbl-body">
+                            <tr><td colspan="6" class="empty-msg">No activation orders found. Select a service from API Store.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Page 3: My API -->
+            <section class="page-sec" id="page-api">
+                <h2 class="sec-h2"><i class="fa-solid fa-key"></i> My API Credentials</h2>
+                <div class="card-box">
+                    <p class="desc-txt">Use your personal API Key to integrate Jannat OTP engine into automated scripts and bots.</p>
+                    <div class="form-grp">
+                        <label>Your User API Key</label>
+                        <div class="input-copy-group">
+                            <input type="text" id="user-api-key-input" class="search-inp" value="TnNleTRsV091MXFETEhBTFBSVFdTQT09" readonly>
+                            <button class="btn-action" onclick="copyText('user-api-key-input', 'API Key copied!')"><i class="fa-regular fa-copy"></i> Copy Key</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page: API Integration & Developer Documentation -->
+            <section class="page-sec" id="page-docs">
+                <h2 class="sec-h2"><i class="fa-solid fa-book" style="color: #60a5fa;"></i> API Integration & Developer Documentation</h2>
+                
+                <div class="card-box" style="background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(168,85,247,0.08)); border-color: rgba(99,102,241,0.3); margin-bottom: 24px;">
+                    <h3 style="color: #60a5fa; font-size: 16px; margin-bottom: 8px;"><i class="fa-solid fa-code"></i> Overview & Quick Start</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6;">
+                        Integrate our Virtual Number OTP Allocation API directly into your automated software, Telegram bots, or Python scripts. 
+                        Our REST API accepts standard JSON POST requests and returns instant allocations with real-time status.
+                    </p>
+                </div>
+
+                <!-- API Authentication & Headers Card -->
+                <div class="card-box" style="margin-bottom: 24px;">
+                    <h3 style="color: #fff; font-size: 15px; margin-bottom: 12px;"><i class="fa-solid fa-key" style="color: #fbbf24;"></i> Base URL & Authentication</h3>
+                    <div style="font-size: 13px; color: var(--text-muted); line-height: 1.8;">
+                        <div>Base URL: <code style="background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 6px; color: #34d399; font-family: var(--font-mono);">http://localhost:8000/api/get-number.php</code></div>
+                        <div>HTTP Method: <strong style="color: #60a5fa;">POST</strong></div>
+                        <div>Content-Type: <code style="background: rgba(255,255,255,0.08); padding: 3px 8px; border-radius: 4px; color: #f472b6;">application/json</code></div>
+                    </div>
+                </div>
+
+                <!-- Endpoint 1: Buy Number -->
+                <div class="card-box" style="margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                        <h3 style="color: #fff; font-size: 16px; margin: 0;">
+                            <span style="background: #2563eb; color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; margin-right: 8px;">POST</span>
+                            1. Get / Request Virtual Number
+                        </h3>
+                        <span style="font-size: 12px; color: #34d399; font-family: var(--font-mono);">/api/get-number.php</span>
+                    </div>
+
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 15px;">
+                        Requests a new virtual phone number for a specific service and country.
+                    </p>
+
+                    <!-- Code Language Tabs -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <button class="doc-tab-btn active" onclick="switchDocTab('curl')" id="doc-tab-curl" style="background: rgba(37,99,235,0.2); color: #60a5fa; border: 1px solid rgba(37,99,235,0.4); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">cURL</button>
+                        <button class="doc-tab-btn" onclick="switchDocTab('python')" id="doc-tab-python" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">Python</button>
+                        <button class="doc-tab-btn" onclick="switchDocTab('js')" id="doc-tab-js" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">JavaScript</button>
+                        <button class="doc-tab-btn" onclick="switchDocTab('php')" id="doc-tab-php" style="background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">PHP</button>
+                    </div>
+
+                    <!-- cURL Snippet -->
+                    <div id="doc-code-curl" class="doc-code-block" style="background: #090d16; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; font-family: var(--font-mono); font-size: 13px; color: #34d399; overflow-x: auto; white-space: pre;">curl -X POST "http://localhost:8000/api/get-number.php" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "country": "261",
+    "service": "wa"
+  }'</div>
+
+                    <!-- Python Snippet -->
+                    <div id="doc-code-python" class="doc-code-block" style="display: none; background: #090d16; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; font-family: var(--font-mono); font-size: 13px; color: #60a5fa; overflow-x: auto; white-space: pre;">import requests
+
+url = "http://localhost:8000/api/get-number.php"
+payload = {
+    "country": "261",  # 261 = Madagascar, 44 = UK, any = Any Country
+    "service": "wa"    # wa = WhatsApp, tg = Telegram, etc.
+}
+
+response = requests.post(url, json=payload)
+data = response.json()
+print("Allocated Number:", data["zenex_response"]["data"]["number"])</div>
+
+                    <!-- JS Snippet -->
+                    <div id="doc-code-js" class="doc-code-block" style="display: none; background: #090d16; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; font-family: var(--font-mono); font-size: 13px; color: #fbbf24; overflow-x: auto; white-space: pre;">const response = await fetch('http://localhost:8000/api/get-number.php', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    country: '261',
+    service: 'wa'
+  })
+});
+
+const result = await response.json();
+console.log('Allocated Phone Number:', result.zenex_response.data.number);</div>
+
+                    <!-- PHP Snippet -->
+                    <div id="doc-code-php" class="doc-code-block" style="display: none; background: #090d16; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 15px; font-family: var(--font-mono); font-size: 13px; color: #c084fc; overflow-x: auto; white-space: pre;"><?php
+$url = "http://localhost:8000/api/get-number.php";
+$data = json_encode([
+    "country" => "261",
+    "service" => "wa"
+]);
+
+$ch = curl_init($url);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+curl_setopt($ch, CURLOPT_HTTPHEADER, ["Content-Type: application/json"]);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+curl_close($ch);
+$result = json_decode($response, true);
+print_r($result);
+?></div>
+
+                    <!-- Response Example -->
+                    <h4 style="color: #fff; font-size: 14px; margin-top: 20px; margin-bottom: 8px;"><i class="fa-solid fa-reply"></i> Example Success Response (HTTP 200)</h4>
+                    <div style="background: #090d16; border: 1px solid rgba(16,185,129,0.3); border-radius: 8px; padding: 15px; font-family: var(--font-mono); font-size: 12px; color: #34d399; overflow-x: auto; white-space: pre;">{
+  "success": true,
+  "http_code": 200,
+  "requested_country": "Madagascar",
+  "zenex_response": {
+    "meta": { "status": "success", "code": 200 },
+    "data": {
+      "copy": "+261344424338",
+      "number": "+261344424338",
+      "full_number": "261344424338",
+      "country": "Madagascar",
+      "operator": "Airtel",
+      "status": "pending"
+    }
+  }
+}</div>
+                </div>
+
+                <!-- Country & Service Mapping Parameters -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    
+                    <!-- Country Codes Table -->
+                    <div class="card-box">
+                        <h4 style="color: #60a5fa; font-size: 15px; margin-bottom: 12px;"><i class="fa-solid fa-globe"></i> Supported Country Codes</h4>
+                        <div class="table-card" style="margin: 0; box-shadow: none;">
+                            <table class="data-tbl" style="font-size: 12px;">
+                                <thead>
+                                    <tr><th>Code</th><th>Country</th><th>Dial Prefix</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code style="color:#fbbf24;">any</code></td><td>Any Available Country</td><td>Fastest</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">261</code></td><td>Madagascar 🇲🇬</td><td>+261</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">224</code></td><td>Guinea 🇬🇳</td><td>+224</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">382</code></td><td>Montenegro 🇲🇪</td><td>+382</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">380</code></td><td>Ukraine 🇺🇦</td><td>+380</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">992</code></td><td>Tajikistan 🇹🇯</td><td>+992</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">232</code></td><td>Sierra Leone 🇸🇱</td><td>+232</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">44</code></td><td>United Kingdom 🇬🇧</td><td>+44</td></tr>
+                                    <tr><td><code style="color:#fbbf24;">374</code></td><td>Armenia 🇦🇲</td><td>+374</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Service Codes Table -->
+                    <div class="card-box">
+                        <h4 style="color: #a855f7; font-size: 15px; margin-bottom: 12px;"><i class="fa-solid fa-cubes"></i> Supported Service Shortcodes</h4>
+                        <div class="table-card" style="margin: 0; box-shadow: none;">
+                            <table class="data-tbl" style="font-size: 12px;">
+                                <thead>
+                                    <tr><th>Code</th><th>Service Name</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td><code style="color:#a855f7;">wa</code></td><td>WhatsApp</td></tr>
+                                    <tr><td><code style="color:#a855f7;">tg</code></td><td>Telegram</td></tr>
+                                    <tr><td><code style="color:#a855f7;">fb</code></td><td>Facebook</td></tr>
+                                    <tr><td><code style="color:#a855f7;">go</code></td><td>Google / Gmail</td></tr>
+                                    <tr><td><code style="color:#a855f7;">ai</code></td><td>OpenAI / ChatGPT</td></tr>
+                                    <tr><td><code style="color:#a855f7;">lf</code></td><td>TikTok</td></tr>
+                                    <tr><td><code style="color:#a855f7;">ig</code></td><td>Instagram</td></tr>
+                                    <tr><td><code style="color:#a855f7;">tw</code></td><td>Twitter / X</td></tr>
+                                    <tr><td><code style="color:#a855f7;">bn</code></td><td>Binance</td></tr>
+                                    <tr><td><code style="color:#a855f7;">dc</code></td><td>Discord</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Page: Temp Mail / Email Receive -->
+            <section class="page-sec" id="page-email">
+                <h2 class="sec-h2"><i class="fa-solid fa-envelope" style="color: #a855f7;"></i> Instant Temp Mail & Inbox Receiver</h2>
+                
+                <div class="card-box" style="background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), rgba(99, 102, 241, 0.08)); border-color: rgba(168, 85, 247, 0.3); margin-bottom: 24px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                        <span style="font-size: 13px; color: #c084fc; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;"><i class="fa-solid fa-bolt"></i> Active Temporary Email Address</span>
+                        <span id="webapp-temp-sync-badge" style="font-size: 12px; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 4px 10px; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                            <i class="fa-solid fa-rotate fa-spin" id="webapp-sync-ic"></i> Auto Syncing (5s)
+                        </span>
+                    </div>
+
+                    <div class="input-copy-group" style="margin-bottom: 18px;">
+                        <input type="text" id="webapp-temp-email-display" class="search-inp" style="font-size: 16px; font-weight: bold; color: #a78bfa; font-family: var(--font-mono);" value="Generating email..." readonly>
+                        <button class="btn-action" onclick="copyWebappTempEmail()" style="background: linear-gradient(135deg, #a855f7, #7c3aed);"><i class="fa-regular fa-copy"></i> Copy Email</button>
+                    </div>
+
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 200px; display: flex; gap: 6px;">
+                            <input type="text" id="webapp-custom-user" class="search-inp" placeholder="Custom username (optional)" style="flex: 1; font-size: 13px;">
+                            <select id="webapp-custom-domain" class="select-inp" style="width: auto; min-width: 140px; font-size: 13px;">
+                                <option value="sharklasers.com" selected>@sharklasers.com</option>
+                                <option value="guerrillamail.com">@guerrillamail.com</option>
+                                <option value="guerrillamailblock.com">@guerrillamailblock.com</option>
+                                <option value="guerrillamail.net">@guerrillamail.net</option>
+                                <option value="guerrillamail.org">@guerrillamail.org</option>
+                                <option value="pokemail.net">@pokemail.net</option>
+                                <option value="grr.la">@grr.la</option>
+                            </select>
+                        </div>
+                        <button class="btn-action" onclick="setWebappCustomEmail()" style="padding: 10px 16px; font-size: 13px;"><i class="fa-solid fa-check"></i> Set Custom</button>
+                        <button class="btn-action" onclick="generateWebappRandomEmail()" style="background: rgba(255,255,255,0.08); padding: 10px 16px; font-size: 13px;"><i class="fa-solid fa-shuffle"></i> Random</button>
+                        <button class="btn-action btn-green" onclick="checkWebappInbox(true)" style="padding: 10px 16px; font-size: 13px;"><i class="fa-solid fa-rotate"></i> Refresh Inbox</button>
+                    </div>
+                </div>
+
+                <!-- Persistent Extracted OTP Banner on Page -->
+                <div id="webapp-page-otp-banner" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px dashed #10b981; border-radius: 12px; padding: 18px; margin-bottom: 20px; text-align: center;">
+                    <div style="font-size: 12px; color: #a7f3d0; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px;">🎉 Latest Received OTP Code</div>
+                    <div style="font-size: 32px; font-weight: 800; color: #34d399; letter-spacing: 4px; font-family: var(--font-mono);" id="webapp-page-otp-val">------</div>
+                    <div style="margin-top: 8px; font-size: 13px; color: var(--text-muted);" id="webapp-page-otp-sender">From: Service Verification</div>
+                    <button onclick="copyText('webapp-page-otp-val', 'OTP Code copied!')" class="btn-action btn-green" style="margin: 12px auto 0 auto; display: inline-flex; padding: 10px 20px; font-size: 14px;">
+                        <i class="fa-regular fa-copy"></i> Copy OTP Code
+                    </button>
+                </div>
+
+                <h3 style="font-size: 16px; color: #fff; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;">
+                    <span><i class="fa-solid fa-inbox" style="color: #a855f7;"></i> Received Emails (<span id="webapp-inbox-count">0</span>)</span>
+                    <button onclick="clearWebappInboxHistory()" style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer;"><i class="fa-solid fa-trash"></i> Clear Inbox</button>
+                </h3>
+
+                <div class="table-card">
+                    <div id="webapp-inbox-list">
+                        <div style="text-align: center; padding: 50px 20px; color: var(--text-muted);">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 28px; color: #a855f7; margin-bottom: 12px;"></i>
+                            <p style="margin: 0; font-size: 14px;">Loading messages...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Generic Page Handler for Records -->
+            <section class="page-sec" id="page-records">
+                <h2 class="sec-h2" id="records-title"><i class="fa-solid fa-list"></i> Activity Records</h2>
+                <div class="table-card">
+                    <table class="data-tbl">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Service</th>
+                                <th>Target / Phone</th>
+                                <th>Data / Code</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="records-tbl-body">
+                            <tr><td colspan="6" class="empty-msg">No history logs found.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Page: Recharge / Deposit -->
+            <section class="page-sec" id="page-recharge">
+                <h2 class="sec-h2"><i class="fa-solid fa-credit-card"></i> Account Recharge & Balance Topup</h2>
+                
+                <div class="card-box" style="margin-bottom: 24px; background: rgba(37,99,235,0.06); border-color: rgba(37,99,235,0.25);">
+                    <h3 style="color: #60a5fa; font-size: 16px; margin-bottom: 8px;"><i class="fa-solid fa-circle-info"></i> How to Recharge Balance?</h3>
+                    <p style="font-size: 13px; color: var(--text-muted);">
+                        Send payment via <strong>Easypaisa, JazzCash or Bank Transfer</strong> to the admin on WhatsApp, then submit the deposit request below. Balance will be credited after admin approval!
+                    </p>
+                </div>
+
+                <!-- Submit Proof Form -->
+                <div class="card-box">
+                    <h3 style="font-size: 16px; color: #fff; margin-bottom: 16px;"><i class="fa-solid fa-receipt"></i> Submit Payment Deposit Request (Auto Payment Add)</h3>
+                    <form id="recharge-proof-form">
+                        <div class="form-grp">
+                            <label>Sender Mobile Number / Account No.</label>
+                            <input type="text" id="pay-phone-inp" class="search-inp" placeholder="e.g. 03412190037" required>
+                        </div>
+
+                        <div class="form-grp" style="margin-top: 15px;">
+                            <label>Payment Method</label>
+                            <select id="pay-method-select" class="select-inp">
+                                <option value="Easypaisa">Easypaisa</option>
+                                <option value="JazzCash">JazzCash</option>
+                                <option value="Bank Transfer">Bank Transfer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-grp" style="margin-top: 15px;">
+                            <label>Amount Paid (PKR)</label>
+                            <input type="number" id="pay-amount-inp" class="search-inp" placeholder="e.g. 200" min="10" required>
+                        </div>
+
+                        <button type="submit" class="btn-action btn-green" style="margin-top: 20px; width: 100%; padding: 14px; font-size: 15px;">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Deposit Request
+                        </button>
+                    </form>
+                </div>
+
+
+            </section>
+
+            <!-- Page: Password Modification -->
+            <section class="page-sec" id="page-password">
+                <h2 class="sec-h2"><i class="fa-solid fa-key"></i> Password Modification</h2>
+                <div class="card-box" style="max-width: 500px;">
+                    <div class="form-grp">
+                        <label>Current Password</label>
+                        <input type="password" class="search-inp" placeholder="Enter current password">
+                    </div>
+                    <div class="form-grp" style="margin-top: 15px;">
+                        <label>New Password</label>
+                        <input type="password" class="search-inp" placeholder="Enter new password (min 6 chars)">
+                    </div>
+                    <div class="form-grp" style="margin-top: 15px;">
+                        <label>Confirm New Password</label>
+                        <input type="password" class="search-inp" placeholder="Repeat new password">
+                    </div>
+                    <button class="btn-action" style="margin-top: 20px; width: 100%; padding: 12px;">Update Password</button>
+                </div>
+            </section>
+
+            <!-- Page: Deposit Approval Panel (Auto Balance Addition) -->
+            <section class="page-sec" id="page-deposit-approval">
+                <h2 class="sec-h2"><i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Deposit & User Management Panel</h2>
+                
+                <div class="card-box" style="margin-bottom: 20px; background: rgba(16,185,129,0.06); border-color: rgba(16,185,129,0.25);">
+                    <h3 style="color: #34d399; font-size: 15px; margin-bottom: 6px;"><i class="fa-solid fa-circle-check"></i> Admin Operations & Approval</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin: 0;">
+                        Review user payment requests and manage registered user accounts. Clicking <strong>Accept & Add Balance</strong> automatically credits PKR balance to the user.
+                    </p>
+                </div>
+
+                <h3 class="sec-h2" style="font-size: 16px; margin-top: 10px;"><i class="fa-solid fa-money-bill-transfer"></i> Deposit Payment Requests</h3>
+                <div class="table-card" style="margin-bottom: 30px;">
+                    <table class="data-tbl">
+                        <thead>
+                            <tr>
+                                <th>Req ID</th>
+                                <th>User Account</th>
+                                <th>Sender Phone</th>
+                                <th>Method</th>
+                                <th>Amount (PKR)</th>
+                                <th>Trx ID</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deposit-requests-tbl-body">
+                            <tr><td colspan="8" class="empty-msg">No deposit requests pending. Submit a request from Account Recharge page.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="sec-h2" style="font-size: 16px;"><i class="fa-solid fa-users"></i> Registered User Accounts Database</h3>
+                <div class="table-card">
+                    <table class="data-tbl">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Full Name</th>
+                                <th>Email</th>
+                                <th>Registered Date</th>
+                                <th>Account Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-tbl-body">
+                            <tr><td colspan="6" class="empty-msg">Loading registered accounts...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Page: Invite Management & Referral Program -->
+            <section class="page-sec" id="page-invites">
+                <h2 class="sec-h2"><i class="fa-solid fa-gift" style="color: #34d399;"></i> Invite Friends & Earn Rs. 10 Per Account</h2>
+                
+                <div class="card-box" style="background: linear-gradient(135deg, rgba(16,185,129,0.08), rgba(59,130,246,0.08)); border-color: rgba(16,185,129,0.3); margin-bottom: 24px;">
+                    <h3 style="color: #34d399; font-size: 16px; margin-bottom: 8px;"><i class="fa-solid fa-coins"></i> Rs. 10 Instant Gift Bonus Per Referral</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6;">
+                        Share your unique referral link with friends. Whenever someone creates a new account using your link or referral code, 
+                        <strong>Rs. 10 Gift Bonus</strong> will be instantly credited to your account balance!
+                    </p>
+                </div>
+
+                <!-- Unique Referral Link Card -->
+                <div class="card-box" style="margin-bottom: 24px;">
+                    <h3 style="color: #fff; font-size: 15px; margin-bottom: 12px;"><i class="fa-solid fa-link" style="color: #60a5fa;"></i> Your Personal Referral Link</h3>
+                    <div class="input-copy-group" style="margin-bottom: 15px;">
+                        <input type="text" id="user-ref-link-input" class="search-inp" value="http://localhost:8000/?ref=guest" readonly style="font-family: var(--font-mono); color: #34d399;">
+                        <button class="btn-action" onclick="copyText('user-ref-link-input', 'Referral link copied to clipboard!')"><i class="fa-regular fa-copy"></i> Copy Link</button>
+                    </div>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        <button class="btn-action" id="share-wa-ref-btn" onclick="shareRefOnWhatsApp()" style="background: #25d366; color: white;">
+                            <i class="fa-brands fa-whatsapp" style="font-size: 16px;"></i> Share on WhatsApp
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Earnings Stats Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 25px;">
+                    <div class="card-box" style="text-align: center; padding: 20px;">
+                        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Total Invited Friends</div>
+                        <div style="font-size: 28px; font-weight: 800; color: #60a5fa; margin-top: 6px;" id="ref-invited-count">0</div>
+                    </div>
+                    <div class="card-box" style="text-align: center; padding: 20px;">
+                        <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 600;">Total Gift Earnings</div>
+                        <div style="font-size: 28px; font-weight: 800; color: #34d399; margin-top: 6px;" id="ref-earned-total">Rs. 0</div>
+                    </div>
+                </div>
+
+                <!-- Referral History Table -->
+                <h3 class="sec-h2" style="font-size: 16px;"><i class="fa-solid fa-list-check"></i> Your Invited Referrals History</h3>
+                <div class="table-card">
+                    <table class="data-tbl">
+                        <thead>
+                            <tr>
+                                <th>Ref ID</th>
+                                <th>Invited User</th>
+                                <th>Full Name</th>
+                                <th>Date Joined</th>
+                                <th>Gift Reward</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ref-history-tbl-body">
+                            <tr><td colspan="5" class="empty-msg">No referrals yet. Share your referral link to earn Rs. 10 per signup!</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Page: Commission & Payouts -->
+            <section class="page-sec" id="page-commission">
+                <h2 class="sec-h2"><i class="fa-solid fa-sack-dollar" style="color: #fbbf24;"></i> Commission & Referral Payouts</h2>
+                
+                <div class="card-box" style="background: linear-gradient(135deg, rgba(245,158,11,0.08), rgba(16,185,129,0.08)); border-color: rgba(245,158,11,0.3); margin-bottom: 24px;">
+                    <h3 style="color: #fbbf24; font-size: 16px; margin-bottom: 8px;"><i class="fa-solid fa-hand-holding-dollar"></i> Instant Gift Bonus Payouts</h3>
+                    <p style="font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6;">
+                        All referral bonuses (Rs. 10 per account) are automatically added directly to your website account balance. 
+                        You can use your referral earnings to purchase virtual OTP numbers instantly!
+                    </p>
+                </div>
+            </section>
+
+            <!-- Page: Financial History -->
+            <section class="page-sec" id="page-financial">
+                <h2 class="sec-h2"><i class="fa-solid fa-file-invoice-dollar"></i> Financial History</h2>
+                <div class="table-card">
+                    <table class="data-tbl">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Balance After</th>
+                                <th>Note</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financial-tbl-body">
+                            <tr><td colspan="5" class="empty-msg">No financial records found.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ==================== LOGIN MODAL ==================== -->
+    <div class="modal-overlay" id="login-modal" style="display:none;">
+        <div class="modal-box" style="max-width: 420px;">
+            <div class="modal-head">
+                <h3><i class="fa-solid fa-right-to-bracket"></i> Login to Jannat OTP</h3>
+                <button class="modal-close" id="close-login"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="login-form">
+                    <div class="form-grp">
+                        <label>Email Address</label>
+                        <input type="email" id="login-email" class="search-inp" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-grp" style="margin-top: 14px;">
+                        <label>Password</label>
+                        <input type="password" id="login-password" class="search-inp" placeholder="Enter your password" required>
+                    </div>
+                    <div style="text-align: right; margin-top: 8px;">
+                        <a href="#" style="font-size: 12px; color: #60a5fa; text-decoration: none;">Forgot password?</a>
+                    </div>
+                    <button type="submit" class="btn-action btn-green" style="margin-top: 16px; width: 100%; padding: 13px; font-size: 15px;">
+                        <i class="fa-solid fa-right-to-bracket"></i> Login
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted);">
+                    Don't have an account? <a href="#" id="switch-to-register" style="color: #60a5fa; text-decoration: none; font-weight: 600;">Register Now</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== REGISTER MODAL ==================== -->
+    <div class="modal-overlay" id="register-modal" style="display:none;">
+        <div class="modal-box" style="max-width: 420px;">
+            <div class="modal-head">
+                <h3><i class="fa-solid fa-user-plus"></i> Create Account</h3>
+                <button class="modal-close" id="close-register"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <form id="register-form">
+                    <div class="form-grp">
+                        <label>Full Name</label>
+                        <input type="text" id="register-name" class="search-inp" placeholder="Your full name" required>
+                    </div>
+                    <div class="form-grp" style="margin-top: 14px;">
+                        <label>Username</label>
+                        <input type="text" id="register-username" class="search-inp" placeholder="e.g. jannat_user" autocomplete="username" minlength="3" maxlength="30" pattern="[A-Za-z0-9_]+" title="Use 3–30 letters, numbers, or underscores." required>
+                    </div>
+                    <div class="form-grp" style="margin-top: 14px;">
+                        <label>Email Address</label>
+                        <input type="email" id="register-email" class="search-inp" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-grp" style="margin-top: 14px;">
+                        <label>Password</label>
+                        <input type="password" id="register-password" class="search-inp" placeholder="Min 8 characters" minlength="8" required>
+                    </div>
+                    <div class="form-grp" style="margin-top: 14px;">
+                        <label>Referral / Inviter Code (Optional)</label>
+                        <input type="text" id="register-refcode" class="search-inp" placeholder="e.g. referrer_username">
+                    </div>
+                    <button type="submit" class="btn-action btn-green" style="margin-top: 18px; width: 100%; padding: 13px; font-size: 15px;">
+                        <i class="fa-solid fa-user-plus"></i> Create My Account
+                    </button>
+                </form>
+                <p style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted);">
+                    Already have an account? <a href="#" id="switch-to-login" style="color: #60a5fa; text-decoration: none; font-weight: 600;">Login Here</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FLOATING WHATSAPP BUTTON ==================== -->
+    <a href="https://wa.me/923157119642?text=Hi%20Support!%20I%20need%20help%20with%20my%20Jannat%20OTP%20account." target="_blank" class="whatsapp-float" title="Chat on WhatsApp">
+        <i class="fa-brands fa-whatsapp"></i>
+    </a>
+
+    <!-- ==================== TEMP MAIL MODAL ==================== -->
+    <div class="modal-overlay" id="webapp-email-modal" style="display:none;">
+        <div class="modal-box" style="max-width: 700px; background: #0f172a; border-color: rgba(255,255,255,0.15);">
+            <div class="modal-head" style="background: #1e293b; padding: 16px 20px;">
+                <h3><i class="fa-solid fa-envelope-open-text" style="color: #a855f7;"></i> View Email Message</h3>
+                <button class="modal-close" onclick="closeWebappEmailModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body" style="padding: 20px;">
+                <div style="margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                    <div style="font-size: 18px; font-weight: bold; color: #fff; margin-bottom: 8px;" id="webapp-modal-subject">Subject</div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 15px; font-size: 13px; color: var(--text-muted);">
+                        <div><strong>From:</strong> <span id="webapp-modal-from" style="color: #60a5fa;">-</span></div>
+                        <div><strong>Date:</strong> <span id="webapp-modal-date" style="color: #94a3b8;">-</span></div>
+                    </div>
+                </div>
+
+                <!-- OTP Highlight Banner -->
+                <div id="webapp-modal-otp-banner" style="display: none; background: rgba(16, 185, 129, 0.15); border: 1px dashed #10b981; border-radius: 10px; padding: 14px; margin-bottom: 18px; text-align: center;">
+                    <div style="font-size: 11px; color: #a7f3d0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">Detected OTP Verification Code</div>
+                    <div style="font-size: 26px; font-weight: 800; color: #34d399; letter-spacing: 3px; font-family: var(--font-mono);" id="webapp-modal-otp-code">123456</div>
+                    <button onclick="copyText('webapp-modal-otp-code', 'OTP Code copied!')" class="btn-sm btn-green" style="margin: 8px auto 0 auto; display: inline-flex;">
+                        <i class="fa-regular fa-copy"></i> Copy OTP Code
+                    </button>
+                </div>
+
+                <!-- Email Body Box -->
+                <div id="webapp-modal-body" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 18px; color: #e2e8f0; font-size: 14px; min-height: 180px; max-height: 400px; overflow-y: auto;">
+                    Loading email content...
+                </div>
+            </div>
+            <div style="background: #1e293b; padding: 12px 20px; border-top: 1px solid var(--border-color); text-align: right;">
+                <button onclick="closeWebappEmailModal()" class="btn-sm" style="padding: 8px 18px;">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="script.js?v=10"></script>
+
+    <!-- Vercel Speed Insights -->
+    <script type="module">
+        import { injectSpeedInsights } from 'https://cdn.jsdelivr.net/npm/@vercel/speed-insights@1/dist/index.mjs';
+        injectSpeedInsights();
+    </script>
+</body>
+</html>
