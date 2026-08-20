@@ -1,0 +1,47 @@
+[
+    {
+        "id": 1,
+        "name": "Ali Khan",
+        "username": "alikhan_927",
+        "email": "ali652@gmail.com",
+        "password_hash": "$2y$10$CVLhVvJ3OCHKosfT2Sl31.k0yGSjpsFqSHME7UhN7SCECR6rtTib.",
+        "provider": "email",
+        "created_at": "2026-08-20 04:52:45"
+    },
+    {
+        "id": 2,
+        "name": "Shamshad Hussain",
+        "username": "shamshadhussain29",
+        "email": "shamshadhussain299@gmail.com",
+        "password_hash": "$2y$10$hHfLX\/GpaOudSQ4itmGg4upa4IjusIx\/0yJe5lLfC.2IXUW7PtzyO",
+        "provider": "email",
+        "created_at": "2026-08-20 04:55:09"
+    },
+    {
+        "id": 3,
+        "name": "Usman Raza",
+        "username": "usman_637",
+        "email": "usman583@gmail.com",
+        "password_hash": "$2y$10$82VEa9o828xscagVooJ\/6uiS3T\/Ac6CYLtkdtsMqlb.TLdKn4q4tC",
+        "provider": "email",
+        "created_at": "2026-08-20 05:08:58"
+    },
+    {
+        "id": 4,
+        "name": "sddjfk",
+        "username": "shamshadhussa1122",
+        "email": "shamshadhussain309@gmail.com",
+        "password_hash": "$2y$10$LhtqG0ORbP8hpjLNtqBle.HlGKaralBO2WLJgslCUd3RxHEACCm3e",
+        "provider": "email",
+        "created_at": "2026-08-20 05:39:52"
+    },
+    {
+        "id": 5,
+        "name": "sddjfk",
+        "username": "shamshadhussain200",
+        "email": "shamshadhussain200@gmail.com",
+        "password_hash": "$2y$10$qPWMeRtx5EMAfyswINHGR.DjDdQva69MyCQlPQCeoBHm2NUuh3E5G",
+        "provider": "email",
+        "created_at": "2026-08-20 05:42:37"
+    }
+]
